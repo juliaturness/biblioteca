@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 
 @Entity
@@ -18,14 +19,22 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private UUID id;
 
+    @Column(unique = true, nullable = false)
+    private String auth0Id;
+
+    @Column(nullable = false)
     private String username;
-    private String password;
 
     @Column(unique = true)
     private String email;
 
-    private LocalDateTime birthday;
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
 
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
 }

@@ -1,40 +1,38 @@
 package ifsc.julia.backend.controllers;
 
-import ifsc.julia.backend.dtos.UserRequestDTO;
 import ifsc.julia.backend.dtos.UserResponseDTO;
 import ifsc.julia.backend.models.User;
 import ifsc.julia.backend.services.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/users")
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
-    @PostMapping("/register")
-    public ResponseEntity<UserResponseDTO> registerUser(@RequestBody UserRequestDTO dto){
-
-        User user = userService.save(dto);
-
-        return  ResponseEntity.ok().body(new UserResponseDTO(user));
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody UserRequestDTO dto){
-        try {
-            User user = userService.login(dto.getUsername(), dto.getPassword());
-            return  ResponseEntity.ok().body(new UserResponseDTO(user));
+    // rota para fazer login no Auth0
+    @PostMapping("/sync")
+    public ResponseEntity<UserResponseDTO> syncUser(@AuthenticationPrincipal Jwt jwt) {
 
-        } catch (RuntimeException e) {
-            return  ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
-        }
+        // extrai os dados validados diretamente do Token do Auth0
+        String auth0Id = jwt.getSubject();
+        String email = jwt.getClaimAsString("email");
+        String username = jwt.getClaimAsString("nickname");
+
+        // chama o Service para salvar no banco ou apenas buscar o usuário
+        User user = userService.syncUser(auth0Id, email, username);
+
+        // retorna os dados do banco para o frontend
+        return ResponseEntity.ok(new UserResponseDTO(user));
     }
 }
