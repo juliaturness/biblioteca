@@ -1,7 +1,9 @@
 package ifsc.julia.backend.services;
 
+import ifsc.julia.backend.dtos.UserRequestDTO;
 import ifsc.julia.backend.models.User;
 import ifsc.julia.backend.repositories.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -25,5 +27,28 @@ public class UserService {
                     newUser.setUsername(name);
                     return userRepository.save(newUser);
                 });
+    }
+
+    public User findByAuth0Id(String auth0Id) {
+        return userRepository.findByAuth0Id(auth0Id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+    @Transactional
+    public void deleteUser(String auth0Id){
+        User user = userRepository.findByAuth0Id(auth0Id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        userRepository.delete(user);
+    }
+
+    @Transactional
+    public User updateUser(String auth0Id, UserRequestDTO dto) {
+        User user = userRepository.findByAuth0Id(auth0Id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setUsername(dto.getUsername());
+
+        return userRepository.save(user);
     }
 }
