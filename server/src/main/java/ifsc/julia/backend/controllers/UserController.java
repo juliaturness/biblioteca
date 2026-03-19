@@ -25,15 +25,15 @@ public class UserController {
     @PostMapping("/sync")
     public ResponseEntity<UserResponseDTO> syncUser(@AuthenticationPrincipal Jwt jwt) {
 
-        // extrai os dados validados diretamente do Token do Auth0
+        // extracts validated data directly from the Auth0 token
         String auth0Id = jwt.getSubject();
         String email = jwt.getClaimAsString("email");
         String username = jwt.getClaimAsString("nickname");
 
-        // chama o Service para salvar no banco ou apenas buscar o usuário
+        // calls the service to either save to the database or just retrieve the user
         User user = userService.syncUser(auth0Id, email, username);
 
-        // retorna os dados do banco para o frontend
+        // returns the database data to the frontend
         return ResponseEntity.ok(new UserResponseDTO(user));
     }
 

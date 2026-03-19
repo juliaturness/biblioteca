@@ -15,9 +15,9 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    // chama pelo controller sempre que uma requisição autenticada chega
+    // calls the controller whenever an authenticated request arrives
     public User syncUser(String auth0Id, String email, String name) {
-        // verifica se o usuário já existe no nosso banco pelo ID do Auth0
+        // checks whether the user already exists in our database using the Auth0 ID.
         return userRepository.findByAuth0Id(auth0Id)
                 .orElseGet(() -> {
                     // se não existe, cria o login
