@@ -1,7 +1,6 @@
 package ifsc.julia.backend.services;
 
 import ifsc.julia.backend.models.User;
-import ifsc.julia.backend.dtos.UserRequestDTO;
 import ifsc.julia.backend.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 
@@ -10,35 +9,21 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
-    public User save(UserRequestDTO dto){
-        if(userRepository.findByEmail(dto.getEmail()).isPresent()){
-            throw new RuntimeException("User already exists");
-        }
-
-        User user = new User();
-        user.setEmail(dto.getEmail());
-        user.setPassword(dto.getPassword());
-        user.setUsername(dto.getUsername());
-
-        return userRepository.save(user);
-    }
-
-    public User login(String email, String password){
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        if(user.getPassword() == null){
-            throw new RuntimeException("Password is null");
-        }
-        if(!user.getPassword().equals(password)){
-            throw new RuntimeException("Password does not match");
-        }
-        return user;
+    // chama pelo controller sempre que uma requisição autenticada chega
+    public User syncUser(String auth0Id, String email, String name) {
+        // verifica se o usuário já existe no nosso banco pelo ID do Auth0
+        return userRepository.findByAuth0Id(auth0Id)
+                .orElseGet(() -> {
+                    // se não existe, cria o login
+                    User newUser = new User();
+                    newUser.setAuth0Id(auth0Id);
+                    newUser.setEmail(email);
+                    newUser.setUsername(name);
+                    return userRepository.save(newUser);
+                });
     }
 }
-
-
