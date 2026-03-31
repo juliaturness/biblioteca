@@ -18,13 +18,17 @@ import java.util.UUID;
 public class Book {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     UUID id;
 
     private String title;
     private String author;
+    @Column(columnDefinition = "TEXT")
+    private String description;
     private String genre;
     private String coverUrl;
     private Integer totalPages;
+    @Column(unique = true)
     private String isbn;
+    private double averageRating;
 }
