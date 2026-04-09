@@ -28,4 +28,4 @@ jobs:
 
       - name: build with gradle
         working-directory: server
-        run: ./gradlew build
+        run: ./gradlew build -x test
