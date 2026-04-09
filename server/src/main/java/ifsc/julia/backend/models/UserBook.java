@@ -3,6 +3,7 @@ package ifsc.julia.backend.models;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
 @Table(name = "user_books")
 @NoArgsConstructor
 @AllArgsConstructor
+@Data
 public class UserBook {
 
     @Id
