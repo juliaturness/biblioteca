@@ -29,7 +29,3 @@ jobs:
       - name: build with gradle
         working-directory: server
         run: ./gradlew build
-
-      - name: build with gradle
-        working-directory: server
-        run: ./gradlew build
