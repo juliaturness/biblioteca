@@ -1,6 +1,7 @@
 package ifsc.julia.backend.controllers;
 
 import ifsc.julia.backend.dtos.LibraryRequestDTO;
+import ifsc.julia.backend.dtos.UpdateStatusDTO;
 import ifsc.julia.backend.models.Book;
 import ifsc.julia.backend.models.UserBook;
 import ifsc.julia.backend.services.LibraryService;
@@ -27,7 +28,12 @@ public class LibraryController {
     public ResponseEntity<List<UserBook>> getUserLibrary(@PathVariable UUID userId) {
         List<UserBook> userBooks = libraryService.getUserLibrary(userId);
         return ResponseEntity.ok(userBooks);
-
     }
+
+    @PutMapping("{userID/status}")
+    public ResponseEntity<Book> updateReadingStatus(@PathVariable Long id, @RequestBody UpdateStatusDTO request) {
+
+        libraryService.updateReadingStatus(id, request.getStatus());
+        return ResponseEntity.noContent().build();    }
 
 }

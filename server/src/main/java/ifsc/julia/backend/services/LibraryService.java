@@ -2,6 +2,7 @@ package ifsc.julia.backend.services;
 
 import ifsc.julia.backend.dtos.LibraryRequestDTO;
 import ifsc.julia.backend.models.Book;
+import ifsc.julia.backend.models.ReadingStatus;
 import ifsc.julia.backend.models.User;
 import ifsc.julia.backend.models.UserBook;
 import ifsc.julia.backend.repositories.BookRepository;
@@ -60,6 +61,22 @@ public class LibraryService {
         return userBookRepository.findByUserId_Id(userId);
     }
 
+    public void updateReadingStatus(Long userBookId, ReadingStatus newStatus) {
+        UserBook userBook = userBookRepository.findById(userBookId)
+                .orElseThrow(() -> new RuntimeException("Livro não encontrado na estante!"));
 
+        if (newStatus == ReadingStatus.READING) {
+            if (userBook.getStartDate() == null) {
+                userBook.setStartDate(LocalDateTime.now());
+            }
+        } else if (newStatus == ReadingStatus.READ) {
+            userBook.setFinishDate(LocalDateTime.now());
+            if (userBook.getStartDate() == null) {
+                userBook.setStartDate(LocalDateTime.now());
+            }
+        }
+        userBook.setStatus(newStatus);
+        userBookRepository.save(userBook);
+    }
 
 }
