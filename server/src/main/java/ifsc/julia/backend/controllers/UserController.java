@@ -28,10 +28,13 @@ public class UserController {
         // extracts validated data directly from the Auth0 token
         String auth0Id = jwt.getSubject();
         String email = jwt.getClaimAsString("email");
-        String username = jwt.getClaimAsString("nickname");
+        String name = jwt.getClaimAsString("name");
 
+        if (name == null || name.isBlank()) {
+            name = email.split("@")[0]; // transforma o email do usuario até o @ em username
+        }
         // calls the service to either save to the database or just retrieve the user
-        User user = userService.syncUser(auth0Id, email, username);
+        User user = userService.syncUser(auth0Id, email, name);
 
         // returns the database data to the frontend
         return ResponseEntity.ok(new UserResponseDTO(user));
